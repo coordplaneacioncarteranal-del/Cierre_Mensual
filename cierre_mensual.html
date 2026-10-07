@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=1440"/>
+  <title>Cierre Mensual &ndash; Jardines del Renacer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --az:#1a3a6e;--az2:#2356a8;--az3:#3b7dd8;--azb:#daeaf8;
+      --w:#fff;--g1:#f0f4fa;--g2:#e2e9f3;--g3:#c8d5e8;
+      --r:#c0392b;--rb:#fde8e6;--ve:#1a7a4a;--ve2:#27ae60;--vb:#e4f5ec;
+      --am:#d4800a;--amb:#fef3e2;--na:#c0540a;
+    }
+    html,body{font-family:'Inter',sans-serif;background:#0d1f45;color:var(--az);font-size:13px}
+    .page{width:1440px;margin:0 auto;padding:16px 18px 22px;background:#0d1f45}
+
+    /* LOADING */
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:rgba(255,255,255,.7);gap:16px}
+    .spinner{width:48px;height:48px;border:4px solid rgba(255,255,255,.2);border-top-color:#3b7dd8;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error-msg{background:#fde8e6;color:#c0392b;padding:16px 24px;border-radius:12px;font-weight:600;margin:20px 0}
+
+    /* HEADER */
+    .header{display:flex;align-items:center;gap:20px;background:var(--w);border-radius:16px;padding:14px 24px;margin-bottom:12px;position:relative;overflow:hidden}
+    .header::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--az),var(--az3),#7ab8f5)}
+    .logo-wrap{flex-shrink:0;width:80px;height:80px;border-radius:50%;overflow:hidden;box-shadow:0 4px 20px rgba(26,58,110,.45),0 0 0 3px rgba(59,125,216,.3)}
+    .logo-wrap img{width:100%;height:100%;object-fit:cover}
+    .hinfo h1{font-size:1.65rem;font-weight:900;color:var(--az);letter-spacing:-.3px;line-height:1.1}
+    .hinfo h1 span{color:var(--az3)}
+    .hinfo p{font-size:.82rem;color:#6b88a8;margin-top:3px;font-weight:500}
+    .badges{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .badge{padding:5px 13px;border-radius:16px;font-size:.75rem;font-weight:700}
+    .bf{background:var(--azb);color:var(--az)}.bo{background:var(--vb);color:var(--ve)}.bw{background:var(--rb);color:var(--r)}
+
+    /* SECTIONS */
+    .sc{background:var(--w);border-radius:14px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.18)}
+    .sh{display:flex;align-items:center;gap:10px;padding:11px 18px;color:var(--w);cursor:pointer;user-select:none;transition:opacity 0.2s}
+    .sh:hover{opacity:0.92}
+    .sh.m{background:linear-gradient(90deg,#0d2450,#1a3a6e)}
+    .sh.e{background:linear-gradient(90deg,#0d3320,#1a6640)}
+    .sh.c{background:linear-gradient(90deg,#2d0a4e,#6a1a9a)}
+    
+    .toggle-icon{margin-left:auto;font-size:1.4rem;transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);opacity:0.8}
+    .sc.collapsed .toggle-icon{transform:rotate(-90deg)}
+    .sc-content{transition:max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;max-height:6000px;opacity:1;overflow:hidden}
+    .sc.collapsed .sc-content{max-height:0!important;opacity:0;pointer-events:none}
+
+    /* TABLES */
+    table{width:100%;border-collapse:collapse;table-layout:auto}
+    .tg th{padding:7px 9px;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px;text-align:center;background:var(--g1);border-bottom:1px solid var(--g2);color:#6b88a8}
+    .ts th{padding:7px 9px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b88a8;background:var(--g1);border-bottom:2px solid var(--g3);text-align:right;white-space:nowrap;overflow:hidden;position:relative}
+    .ts th:first-child{text-align:left}
+    tbody tr{border-bottom:1px solid var(--g2)}
+    tbody tr:hover{background:var(--g1)}
+    tbody tr.tot{font-weight:800;background:linear-gradient(90deg,var(--azb),#eef5fc);border-top:2px solid var(--az3)}
+    td{padding:8px 9px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem;color:var(--az)}
+    td:first-child{text-align:left;font-weight:600}
+    .nr{color:var(--r);font-weight:700}
+    .pill{display:inline-block;padding:3px 8px;border-radius:10px;font-size:.68rem;font-weight:800}
+    .pv{background:var(--vb);color:var(--ve)}.pa{background:var(--amb);color:var(--am)}.pr{background:var(--rb);color:var(--r)}
+
+    .ib{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .st{font-size:1rem;font-weight:800;letter-spacing:.5px}
+    .ss{font-size:.7rem;opacity:.75;margin-top:1px}
+    .update-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:12px;background:#e8f5e9;color:#1a7a4a;font-size:.7rem;font-weight:700;margin-left:auto}
+    .dot-live{width:7px;height:7px;border-radius:50%;background:#27ae60;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .footer{text-align:center;margin-top:10px;color:rgba(255,255,255,.4);font-size:.68rem}
+
+    /* SORT */
+    th.sortable{cursor:pointer;user-select:none;padding-right:22px!important;transition:background .15s}
+    th.sortable:hover{background:#dce8f5!important;color:#1a3a6e!important}
+    th.sortable::after{content:'⇅';position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:.7rem;opacity:.4}
+    th.sortable.asc::after{content:'▲';opacity:1}
+    th.sortable.desc::after{content:'▼';opacity:1}
+
+    /* LOGIN */
+    #login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#0d1f45;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s ease}
+    .login-box{background:var(--w);padding:35px 30px;border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.6);text-align:center;width:90%;max-width:380px}
+    .login-box img{width:85px;height:85px;border-radius:50%;margin-bottom:18px;box-shadow:0 4px 15px rgba(26,58,110,.25)}
+    .login-box h2{color:var(--az);font-size:1.4rem;font-weight:900;margin-bottom:8px;letter-spacing:-.5px}
+    .login-box p{color:#6b88a8;font-size:.85rem;margin-bottom:22px;font-weight:500;line-height:1.4}
+    .login-box input{width:100%;padding:13px 16px;border:2px solid var(--g2);border-radius:10px;font-size:1rem;margin-bottom:16px;outline:none;transition:border-color .3s;font-family:inherit}
+    .login-box input:focus{border-color:var(--az3)}
+    .login-box button{width:100%;padding:14px;background:linear-gradient(90deg,var(--az2),var(--az3));color:var(--w);border:none;border-radius:10px;font-size:1.05rem;font-weight:800;cursor:pointer;transition:transform .2s,box-shadow .2s;font-family:inherit}
+    .login-box button:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(59,125,216,.3)}
+    .login-error{color:var(--r);font-size:.8rem;margin-top:12px;display:none;font-weight:700;background:var(--rb);padding:8px;border-radius:8px}
+  </style>
+</head>
+<body>
+<div id="login-overlay">
+  <div class="login-box">
+    <img src="logo_jardines.png" alt="Logo Jardines"/>
+    <h2>Acceso Restringido</h2>
+    <p>Por favor ingresa tu contraseña para ver el Cuadro de Mando de Recaudo.</p>
+    <input type="password" id="pass-input" placeholder="Contraseña" autocomplete="off" onkeypress="if(event.key==='Enter') tryLogin()"/>
+    <button onclick="tryLogin()">Ingresar</button>
+    <div id="login-error" class="login-error">Contraseña incorrecta. Intenta de nuevo.</div>
+  </div>
+</div>
+<div class="page">
+  <div class="header">
+    <div class="logo-wrap"><img src="logo_jardines.png" alt="Logo Jardines del Renacer"/></div>
+    <div class="hinfo">
+      <h1>Jardines del <span>Renacer</span></h1>
+      <p>Cuadro de Mando &middot; Cierre Mensual &mdash; Datos en tiempo real desde Google Sheets</p>
+      <div class="badges">
+        <span class="badge bf" id="badge-corte">📅 Cargando fecha...</span>
+      </div>
+    </div>
+    <span class="update-badge" id="refresh-badge"><span class="dot-live"></span> Actualizando...</span>
+  </div>
+
+  <div id="contenido">
+    <div class="loading">
+      <div class="spinner"></div>
+      <span>Cargando informe mensual...</span>
+    </div>
+  </div>
+
+  <div class="footer">Jardines del Renacer &bull; Cuadro de Mando &middot; Cierre Mensual</div>
+</div>
+
+<script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyddVV8yXjKgO97sZ9JM_fCwvNSPjc-LZAd_dl167T356g-8aXeTWmljvwLmX8TBzhIhSsMdfZ2Y4W/pub?output=csv';
+
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/);
+  return lines.map(line => {
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    return cols;
+  });
+}
+
+function fmt(v) { return v ? v.toString().trim() : ''; }
+
+function getCompras(rows) {
+  const block = { title: '', headers: [], data: [] };
+  if(rows.length < 2) return block;
+  block.title = fmt(rows[0][0]);
+  for(let c=0; c<4; c++) block.headers.push(fmt(rows[0][c]));
+  for(let i=1; i<rows.length; i++) {
+    if (!fmt(rows[i][0])) break;
+    const d = [];
+    for(let c=0; c<4; c++) d.push(fmt(rows[i][c]));
+    block.data.push(d);
+  }
+  block.headers[0] = "GRUPO / ASESOR";
+  return block;
+}
+
+function scanBlocks(rows, offset, colCount, startRow = 0) {
+  const blocks = [];
+  let inBlock = false, currentBlock = null;
+  for(let i=startRow; i<rows.length; i++) {
+    const c0 = fmt(rows[i][offset]);
+    if (c0 !== '') {
+      if (!inBlock) {
+        inBlock = true;
+        currentBlock = { title: c0, headers: [], data: [] };
+      } else {
+        if (currentBlock.headers.length === 0) {
+          for(let c=0; c<colCount; c++) currentBlock.headers.push(fmt(rows[i][offset+c]));
+        } else {
+          const d = [];
+          for(let c=0; c<colCount; c++) d.push(fmt(rows[i][offset+c]));
+          currentBlock.data.push(d);
+        }
+      }
+    } else {
+      if (inBlock) {
+        inBlock = false;
+        blocks.push(currentBlock);
+        currentBlock = null;
+      }
+    }
+  }
+  if (currentBlock) blocks.push(currentBlock);
+  return blocks;
+}
+
+function renderTable(block) {
+  if (!block || !block.headers || block.headers.length === 0) return '';
+  let html = `<table class="mt" style="width:auto; min-width:85%; margin:0 auto 20px; font-size:0.75rem;">
+    <thead><tr class="ts">`;
+  block.headers.forEach((h, i) => {
+    html += `<th class="sortable" data-idx="${i}" style="${i===0 ? 'text-align:left' : ''}">${h}</th>`;
+  });
+  html += `</tr></thead><tbody>`;
+  
+  block.data.forEach(r => {
+    const isTot = r[0].toUpperCase().startsWith('TOTAL');
+    html += `<tr${isTot ? ' class="tot"' : ''}>`;
+    r.forEach((val, i) => {
+       const v = fmt(val);
+       if (i === r.length - 1 && v.includes('%')) {
+          const pct = parseFloat(v);
+          const pillCls = pct >= 80 ? 'pv' : pct >= 60 ? 'pa' : 'pr';
+          html += `<td><span class="pill ${pillCls}">${v}</span></td>`;
+       } else {
+          const cls = v.includes('-$') ? ' class="nr"' : '';
+          html += `<td${i===0 ? ' style="text-align:left"' : cls}>${v}</td>`;
+       }
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  return html;
+}
+
+function renderPairs(recBlocks, cliBlocks) {
+  let html = '';
+  const count = Math.max(recBlocks.length, cliBlocks.length);
+  for(let i=0; i<count; i++) {
+    const rb = recBlocks[i], cb = cliBlocks[i];
+    const tL = rb ? rb.title : '';
+    const tR = cb ? cb.title : '';
+    
+    if (tL === tR || !tR || !tL) {
+      const title = tL || tR;
+      html += `<h3 style="font-size:0.85rem; color:#6b20a0; margin-top:10px; margin-bottom:12px; text-transform:uppercase; text-align:center; letter-spacing:0.5px;">${title}</h3>`;
+      html += `<div style="display:flex; gap:20px; align-items:flex-start;">
+        <div style="flex:1; min-width:0; overflow-x:auto;">${renderTable(rb)}</div>
+        <div style="flex:1; min-width:0; overflow-x:auto;">${renderTable(cb)}</div>
+      </div>`;
+    } else {
+      html += `<div style="display:flex; gap:20px; align-items:flex-start; margin-top:10px;">
+        <div style="flex:1; min-width:0; overflow-x:auto; display:flex; flex-direction:column;">
+          <h3 style="font-size:0.85rem; color:#6b20a0; margin-bottom:12px; text-transform:uppercase; text-align:center; letter-spacing:0.5px;">${tL}</h3>
+          ${renderTable(rb)}
+        </div>
+        <div style="flex:1; min-width:0; overflow-x:auto; display:flex; flex-direction:column;">
+          <h3 style="font-size:0.85rem; color:#6b20a0; margin-bottom:12px; text-transform:uppercase; text-align:center; letter-spacing:0.5px;">${tR}</h3>
+          ${renderTable(cb)}
+        </div>
+      </div>`;
+    }
+  }
+  return html;
+}
+
+function makeSortable(table) {
+  const headers = table.querySelectorAll('th.sortable');
+  const tbody = table.querySelector('tbody');
+  
+  headers.forEach(th => {
+    th.addEventListener('click', () => {
+      const isAsc = th.classList.contains('asc');
+      headers.forEach(h => { h.classList.remove('asc', 'desc'); });
+      th.classList.add(isAsc ? 'desc' : 'asc');
+      
+      const idx = Array.from(th.parentNode.children).indexOf(th);
+      const rows = Array.from(tbody.querySelectorAll('tr:not(.tot)'));
+      const totalRow = tbody.querySelector('tr.tot');
+      
+      rows.sort((a, b) => {
+        let va = a.children[idx].textContent.trim();
+        let vb = b.children[idx].textContent.trim();
+        
+        let na = parseFloat(va.replace(/[^0-9.-]+/g, ''));
+        let nb = parseFloat(vb.replace(/[^0-9.-]+/g, ''));
+        
+        if (!isNaN(na) && !isNaN(nb)) {
+          return isAsc ? nb - na : na - nb;
+        } else {
+          return isAsc ? vb.localeCompare(va) : va.localeCompare(vb);
+        }
+      });
+      
+      rows.forEach(r => tbody.appendChild(r));
+      if (totalRow) tbody.appendChild(totalRow);
+    });
+  });
+}
+
+function bindCollapsibles() {
+  document.querySelectorAll('.sh').forEach(header => {
+    header.addEventListener('click', () => {
+      header.parentElement.classList.toggle('collapsed');
+    });
+  });
+}
+
+async function cargarDatos() {
+  const contenido = document.getElementById('contenido');
+  try {
+    let text = '';
+    try {
+      const resp = await fetch(CSV_URL + '&t=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) throw new Error('Error HTTP ' + resp.status);
+      text = await resp.text();
+    } catch (e) {
+      const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(CSV_URL);
+      const resp2 = await fetch(proxyUrl, { cache: 'no-store' });
+      if (!resp2.ok) throw new Error('Error HTTP Proxy ' + resp2.status);
+      text = await resp2.text();
+    }
+    const rows = parseCSV(text);
+
+    const comprasBlock = getCompras(rows);
+    const generalRec = scanBlocks(rows, 8, 5);
+    const generalCli = scanBlocks(rows, 14, 5);
+    const atrasoRec = scanBlocks(rows, 20, 5);
+    const atrasoCli = scanBlocks(rows, 26, 5);
+    const adlRec = scanBlocks(rows, 33, 5);
+    const adlCli = scanBlocks(rows, 39, 5);
+
+    const noRecAtraso = scanBlocks(rows, 0, 3, 8);
+    const noRecAdelanto = scanBlocks(rows, 4, 3, 8);
+
+    let html = '';
+
+    if (comprasBlock.data.length > 0) {
+      html += `<div class="sc collapsed" style="max-width:700px; margin: 0 auto 20px;">
+        <div class="sh e">
+          <div class="ib">🛍️</div>
+          <div><div class="st">${comprasBlock.title || 'COMPRAS DE CARTERA'}</div></div>
+          <div class="toggle-icon">▼</div>
+        </div>
+        <div class="sc-content"><div style="padding:16px; overflow-x:auto;">
+          ${renderTable(comprasBlock)}
+        </div></div>
+      </div>`;
+    }
+
+    if (noRecAtraso.length > 0 || noRecAdelanto.length > 0) {
+      html += `<div class="sc collapsed">
+        <div class="sh" style="background:linear-gradient(90deg,#9b59b6,#8e44ad)">
+          <div class="ib">📉</div>
+          <div>
+            <div class="st">RESUMEN NO RECAUDO</div>
+            <div class="ss">Dinero que faltó por recaudar en el mes</div>
+          </div>
+          <div class="toggle-icon">▼</div>
+        </div>
+        <div class="sc-content"><div style="padding:16px;">
+          ${renderPairs(noRecAtraso, noRecAdelanto)}
+        </div></div>
+      </div>`;
+    }
+
+    html += `<div class="sc collapsed">
+      <div class="sh m">
+        <div class="ib">📊</div>
+        <div>
+          <div class="st">GENERAL DEL RECAUDO Y DE CLIENTES</div>
+          <div class="ss">Resumen global de recaudo frente a clientes activos</div>
+        </div>
+        <div class="toggle-icon">▼</div>
+      </div>
+      <div class="sc-content"><div style="padding:16px;">
+        ${renderPairs(generalRec, generalCli)}
+      </div></div>
+    </div>`;
+
+    html += `<div class="sc collapsed">
+      <div class="sh c">
+        <div class="ib">⚠️</div>
+        <div>
+          <div class="st">ATRASO / CARTERA POR COBRAR</div>
+          <div class="ss">Cartera de meses anteriores hacia atrás</div>
+        </div>
+        <div class="toggle-icon">▼</div>
+      </div>
+      <div class="sc-content"><div style="padding:16px;">
+        ${renderPairs(atrasoRec, atrasoCli)}
+      </div></div>
+    </div>`;
+
+    html += `<div class="sc collapsed">
+      <div class="sh" style="background:linear-gradient(90deg,#0d3320,#1a6640)">
+        <div class="ib">⚡</div>
+        <div>
+          <div class="st">CARTERA ADELANTADA</div>
+          <div class="ss">Pagos efectuados por anticipado</div>
+        </div>
+        <div class="toggle-icon">▼</div>
+      </div>
+      <div class="sc-content"><div style="padding:16px;">
+        ${renderPairs(adlRec, adlCli)}
+      </div></div>
+    </div>`;
+
+    contenido.innerHTML = html;
+    
+    document.getElementById('badge-corte').innerHTML = '📅 Corte: Informe Mensual';
+    
+    // Activar sortables y collapsibles
+    document.querySelectorAll('table').forEach(t => makeSortable(t));
+    bindCollapsibles();
+
+  } catch (err) {
+    contenido.innerHTML = `<div class="error-msg">
+      &#9888;&#65039; Error al cargar datos: ${err.message}<br/>
+      <small>Verifica tu conexi&oacute;n a internet o que el Google Sheets est&eacute; publicado correctamente.</small>
+    </div>`;
+  }
+}
+
+function tryLogin() {
+  const p = document.getElementById('pass-input').value;
+  if (p === 'Cartera.Jardines2026') {
+    const overlay = document.getElementById('login-overlay');
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 400);
+  } else {
+    const err = document.getElementById('login-error');
+    err.style.display = 'block';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', cargarDatos);
+</script>
+</body>
+</html>
